@@ -10,6 +10,8 @@
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;900&display=swap');
         
@@ -49,7 +51,7 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* जादुई फोटो फ्रेम */
+        /* जादुई फोटो फ्रेम डिज़ाइन */
         .magic-frame {
             position: relative;
             padding: 12px;
@@ -131,23 +133,28 @@
             
             const fileInputRef = useRef(null);
             const editorRef = useRef(null);
-            const audioRef = useRef(null);
 
-            const apiKey = "AIzaSyDRp5GreFjuGLzFJKRTeUMiiEVN90xKqeQ"; 
+            // API key is provided by the environment
+            const apiKey = ""; 
 
-            // Exponential backoff helper
+            // Exponential backoff helper for Gemini API
             const fetchWithRetry = async (url, options, maxRetries = 5) => {
                 let delay = 1000;
                 for (let i = 0; i < maxRetries; i++) {
                     try {
                         const response = await fetch(url, options);
                         if (response.ok) return response;
-                        if (response.status !== 429 && response.status < 500) break;
-                    } catch (e) {}
+                        if (response.status !== 429 && response.status < 500) {
+                            const errData = await response.json();
+                            throw new Error(errData.error?.message || "सर्वर त्रुटि");
+                        }
+                    } catch (e) {
+                        if (i === maxRetries - 1) throw e;
+                    }
                     await new Promise(resolve => setTimeout(resolve, delay));
                     delay *= 2;
                 }
-                throw new Error("Failed after retries");
+                throw new Error("नेटवर्क धीमा है, कृपया पुनः प्रयास करें");
             };
 
             useEffect(() => {
@@ -156,14 +163,16 @@
                 return () => window.removeEventListener('scroll', handleScroll);
             }, []);
 
+            // Feature 1: Image Editing with Gemini 2.5 Flash Image Preview
             const applyHoliTransformation = async (imageUri) => {
                 setIsProcessing(true);
                 setError(null);
                 const base64Data = imageUri.split(',')[1];
-                const prompt = "Apply heavy, vibrant organic Holi gulal (pink, yellow, green, blue) on the person's face and clothes. Completely replace the background with a festive Holi morning scene full of color clouds and joyful atmosphere. High resolution, high impact, festive lighting.";
+                
+                const prompt = "इस फोटो को होली उत्सव के रंगीन लुक में बदलें। चेहरे और कपड़ों पर जीवंत गुलाल के रंग (गुलाबी, पीला, नीला) डालें। बैकग्राउंड को होली के उत्सव वाले माहौल में बदलें जिसमें रंगों के बादल और खुशियाँ हों। फोटो असली लगनी चाहिए।";
 
                 try {
-                    const response = await fetchWithRetry(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                    const response = await fetchWithRetry(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -174,8 +183,7 @@
                                 ]
                             }],
                             generationConfig: { 
-                                responseModalities: ['TEXT', 'IMAGE'],
-                                temperature: 0.9 
+                                responseModalities: ['TEXT', 'IMAGE']
                             }
                         })
                     });
@@ -187,21 +195,21 @@
                         setProcessedImage(`data:image/png;base64,${base64}`);
                         setTimeout(() => editorRef.current?.scrollIntoView({ behavior: 'smooth' }), 500);
                     } else {
-                        throw new Error("AI रेस्पोंस खाली है। दोबारा प्रयास करें।");
+                        throw new Error("AI इमेज जनरेट नहीं कर सका।");
                     }
                 } catch (err) {
-                    setError("त्रुटि: " + err.message);
+                    setError("⚠️ " + err.message);
                 } finally {
                     setIsProcessing(false);
                 }
             };
 
+            // Feature 2: Generate Holi Wishes using Gemini 2.5 Flash Preview 09-2025
             const generateHoliShayari = async () => {
-                if (!processedImage) return;
                 setIsGeneratingText(true);
                 setGeneratedWishes("");
 
-                const prompt = "Generate a beautiful and creative 4-line Holi Shayari in Hindi for a social media post. Make it sound cheerful, poetic, and festive. Only return the shayari text.";
+                const prompt = "एक खूबसूरत और रचनात्मक 4-लाइन वाली होली शायरी हिंदी में लिखें। इसे उत्साहपूर्ण और मधुर बनाएँ।";
 
                 try {
                     const response = await fetchWithRetry(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
@@ -209,7 +217,7 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             contents: [{ parts: [{ text: prompt }] }],
-                            systemInstruction: { parts: [{ text: "You are a creative Hindi poet who writes beautiful Holi wishes." }] }
+                            systemInstruction: { parts: [{ text: "You are a poetic Hindi shayari generator for festivals." }] }
                         })
                     });
 
@@ -223,6 +231,7 @@
                 }
             };
 
+            // Feature 3: Voice Generation using Gemini 2.5 Flash Preview TTS
             const playVoiceWish = async () => {
                 if (!generatedWishes || isSpeaking) return;
                 setIsSpeaking(true);
@@ -244,8 +253,7 @@
                     const result = await response.json();
                     const pcmData = result.candidates[0].content.parts[0].inlineData.data;
                     
-                    // Simple PCM to WAV converter logic for browser playback
-                    const wavBlob = pcmToWav(pcmData, 24000); // 24kHz is default for TTS
+                    const wavBlob = pcmToWav(pcmData, 24000); // PCM to WAV conversion for browser playback
                     const url = URL.createObjectURL(wavBlob);
                     const audio = new Audio(url);
                     audio.play();
@@ -262,13 +270,7 @@
                 const pcmBuffer = Uint8Array.from(atob(base64Pcm), c => c.charCodeAt(0)).buffer;
                 const header = new ArrayBuffer(44);
                 const view = new DataView(header);
-                
-                const writeString = (offset, string) => {
-                    for (let i = 0; i < string.length; i++) {
-                        view.setUint8(offset + i, string.charCodeAt(i));
-                    }
-                };
-
+                const writeString = (o, s) => { for (let i=0; i<s.length; i++) view.setUint8(o+i, s.charCodeAt(i)); };
                 writeString(0, 'RIFF');
                 view.setUint32(4, 36 + pcmBuffer.byteLength, true);
                 writeString(8, 'WAVE');
@@ -282,7 +284,6 @@
                 view.setUint16(34, 16, true);
                 writeString(36, 'data');
                 view.setUint32(40, pcmBuffer.byteLength, true);
-
                 return new Blob([header, pcmBuffer], { type: 'audio/wav' });
             };
 
@@ -312,7 +313,7 @@
                                 onClick={() => fileInputRef.current.click()}
                                 className="bg-gradient-to-r from-[#ff0080] to-[#ff8c00] text-white px-8 py-2 rounded-full font-bold text-sm btn-glow transition-all active:scale-95 shadow-lg"
                             >
-                                फोटो जोड़ें 🎉
+                                होली मनाएं 🎉
                             </button>
                         </div>
                     </nav>
@@ -320,7 +321,7 @@
                     <header className="relative pt-48 pb-32 px-6 flex flex-col items-center text-center">
                         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 mb-10">
                             <span className="w-2 h-2 rounded-full bg-[#ff0080] animate-ping"></span>
-                            <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-gray-400">AI Magic & Message Online</span>
+                            <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-gray-400 italic">2026 AI Special</span>
                         </div>
                         
                         <h1 className="text-6xl md:text-[11rem] font-black mb-10 leading-[0.8] tracking-tighter italic uppercase drop-shadow-2xl">
@@ -329,10 +330,11 @@
                         </h1>
                         
                         <p className="text-gray-400 max-w-2xl text-lg md:text-xl font-medium mb-16 leading-relaxed">
-                            सिर्फ एक क्लिक में फोटो एडिट करें और AI से जादुई होली शुभकामनाएँ पाएँ!
+                            सिर्फ एक फोटो अपलोड करें और हमारा AI उसे होली के जादुई रंगों से भर देगा।
                         </p>
 
                         <div className="flex flex-col items-center gap-12">
+                            {/* जादुई फोटो फ्रेम */}
                             <div 
                                 onClick={() => fileInputRef.current.click()}
                                 className="magic-frame w-72 h-72 md:w-[400px] md:h-[400px] cursor-pointer group hover:scale-105 transition-transform"
@@ -340,7 +342,7 @@
                                 <div className="frame-content w-full h-full flex flex-col items-center justify-center bg-[#050505] rounded-[2rem]">
                                     <div className="text-7xl mb-6 group-hover:scale-110 transition-transform">📸</div>
                                     <h3 className="text-xl font-bold text-white mb-2 tracking-wide uppercase">फोटो यहाँ जोड़ें</h3>
-                                    <p className="text-gray-500 text-[10px] uppercase tracking-widest px-10 text-center">AI रंग लगाएगा और संदेश लिखेगा</p>
+                                    <p className="text-gray-500 text-[10px] uppercase tracking-widest px-10 text-center">AI रंग लगाएगा और शायरी भी लिखेगा</p>
                                 </div>
                             </div>
 
@@ -356,17 +358,17 @@
 
                     <section ref={editorRef} className="py-24 px-6 relative z-10 scroll-mt-24 max-w-6xl mx-auto">
                         {originalImage && (
-                            <div className="glass-panel rounded-[4rem] p-8 md:p-16 border border-white/5">
-                                <div className="grid lg:grid-cols-2 gap-16 items-start text-center">
-                                    <div className="space-y-6">
-                                        <h2 className="text-2xl font-black italic tracking-tight uppercase opacity-50">Original Photo</h2>
+                            <div className="glass-panel rounded-[4rem] p-8 md:p-16 border border-white/5 shadow-2xl">
+                                <div className="grid lg:grid-cols-2 gap-16 items-start">
+                                    <div className="space-y-6 w-full">
+                                        <h2 className="text-2xl font-black italic tracking-tight uppercase opacity-50 text-center">Original</h2>
                                         <div className="rounded-[3rem] overflow-hidden border border-white/5 opacity-40 grayscale">
                                             <img src={originalImage} className="w-full aspect-[4/5] object-cover" />
                                         </div>
                                     </div>
 
-                                    <div className="space-y-8">
-                                        <h2 className="text-2xl font-black italic tracking-tight uppercase text-[#ff0080]">Magic Result</h2>
+                                    <div className="space-y-8 w-full">
+                                        <h2 className="text-2xl font-black italic tracking-tight uppercase text-[#ff0080] text-center">Magic Result</h2>
                                         <div className="magic-frame aspect-[4/5] w-full">
                                             <div className="frame-content w-full h-full bg-black/60 rounded-[2rem] overflow-hidden">
                                                 {isProcessing ? (
@@ -385,7 +387,7 @@
                                         </div>
 
                                         {processedImage && !isProcessing && (
-                                            <div className="flex flex-col gap-4">
+                                            <div className="space-y-6">
                                                 <div className="flex gap-4">
                                                     <button 
                                                         onClick={() => { setOriginalImage(null); setProcessedImage(null); setGeneratedWishes(""); }}
@@ -406,8 +408,8 @@
                                                     </button>
                                                 </div>
 
-                                                <div className="pt-6 border-t border-white/10">
-                                                    <h4 className="text-lg font-bold mb-4 italic">✨ AI होली स्पेशल फीचर्स</h4>
+                                                <div className="pt-8 border-t border-white/10 space-y-4">
+                                                    <h3 className="text-lg font-bold italic text-pink-500 uppercase tracking-tighter">✨ AI स्पेशल फीचर्स</h3>
                                                     <div className="flex flex-wrap gap-3 justify-center">
                                                         <button 
                                                             disabled={isGeneratingText}
@@ -423,14 +425,16 @@
                                                                 onClick={playVoiceWish}
                                                                 className="px-6 py-3 bg-orange-600 rounded-xl font-bold text-sm btn-glow transition-all flex items-center gap-2"
                                                             >
-                                                                {isSpeaking ? "🔊 बोल रहा हूँ..." : "✨ AI वॉयस विश"}
+                                                                {isSpeaking ? "🔊 बोल रहा हूँ..." : "🔊 आवाज सुनें"}
                                                             </button>
                                                         )}
                                                     </div>
 
                                                     {generatedWishes && (
-                                                        <div className="ai-message-box animate-fade-in">
-                                                            <p className="text-lg font-medium italic text-pink-200">"{generatedWishes}"</p>
+                                                        <div className="ai-message-box text-left animate-fade-in">
+                                                            <p className="text-lg font-medium italic text-pink-200 leading-relaxed">
+                                                                "{generatedWishes}"
+                                                            </p>
                                                         </div>
                                                     )}
                                                 </div>
@@ -442,7 +446,7 @@
                                     <div className="mt-12 bg-red-600/10 border border-red-500/30 p-8 rounded-[2rem] text-red-400 font-bold text-center">
                                         ⚠️ {error}
                                         <br/>
-                                        <button onClick={() => applyHoliTransformation(originalImage)} className="text-xs underline mt-2 uppercase tracking-widest">पुनः प्रयास करें</button>
+                                        <button onClick={() => originalImage && applyHoliTransformation(originalImage)} className="text-xs underline mt-2 uppercase tracking-widest font-black">पुनः प्रयास करें</button>
                                     </div>
                                 )}
                             </div>
