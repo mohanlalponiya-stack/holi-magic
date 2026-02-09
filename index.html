@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Holi AI Magic Pro | जादुई होली उत्सव</title>
+<title>Holi AI Magic Pro</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -11,7 +11,11 @@
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
 <style>
-body{background:#050505;color:white;font-family:Outfit,sans-serif}
+body{
+  background:#050505;
+  color:white;
+  font-family:system-ui, -apple-system, BlinkMacSystemFont;
+}
 </style>
 </head>
 
@@ -22,90 +26,132 @@ body{background:#050505;color:white;font-family:Outfit,sans-serif}
 const { useState, useRef } = React;
 
 function App() {
-  const [originalImage,setOriginalImage]=useState(null);
-  const [processedImage,setProcessedImage]=useState(null);
-  const [loading,setLoading]=useState(false);
-  const [shayari,setShayari]=useState("");
-  const [error,setError]=useState(null);
-  const fileRef=useRef();
+  const [originalImage,setOriginalImage] = useState(null);
+  const [processedImage,setProcessedImage] = useState(null);
+  const [loading,setLoading] = useState(false);
+  const [shayari,setShayari] = useState("");
+  const [error,setError] = useState(null);
+  const fileRef = useRef();
 
-  const callGemini = async (model,payload) => {
-    const res = await fetch("/api/gemini",{
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body:JSON.stringify({ model, payload })
+  // 🔒 SAFE API CALL (Vercel API route)
+  const callGemini = async (model, payload) => {
+    const res = await fetch("/api/gemini", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ model, payload })
     });
-    if(!res.ok) throw new Error("AI सर्वर से जवाब नहीं मिला");
+
+    if (!res.ok) {
+      throw new Error("AI सर्वर से जवाब नहीं मिला");
+    }
     return res.json();
   };
 
   const applyMagic = async (img) => {
-    try{
-      setLoading(true); setError(null);
+    try {
+      setLoading(true);
+      setError(null);
+      setShayari("");
+      setProcessedImage(null);
+
       const base64 = img.split(",")[1];
 
+      // 🎨 IMAGE GENERATION
       const imgRes = await callGemini(
         "gemini-2.5-flash-image-preview",
         {
-          contents:[{
-            parts:[
-              { text:"Add vibrant Holi colors and festive background" },
-              { inlineData:{ mimeType:"image/png", data:base64 } }
+          contents: [{
+            parts: [
+              { text: "Add vibrant Holi colors, gulal powder and festive background" },
+              { inlineData: { mimeType: "image/png", data: base64 } }
             ]
           }]
         }
       );
 
-      const out = imgRes.candidates[0].content.parts.find(p=>p.inlineData)?.inlineData.data;
-      if(!out) throw new Error("Image generate failed");
+      const imgPart = imgRes?.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+      if (!imgPart) throw new Error("AI इमेज नहीं बना सका");
 
-      setProcessedImage("data:image/png;base64,"+out);
+      setProcessedImage("data:image/png;base64," + imgPart.inlineData.data);
 
+      // ✨ SHAYARI
       const shayariRes = await callGemini(
         "gemini-2.5-flash-preview-09-2025",
-        { contents:[{ parts:[{ text:"होली पर 2 लाइन की शायरी लिखो" }] }] }
+        {
+          contents: [{
+            parts: [{ text: "होली पर एक छोटी 2 लाइन की शायरी लिखो" }]
+          }]
+        }
       );
 
-      setShayari(shayariRes.candidates[0].content.parts[0].text);
+      setShayari(
+        shayariRes?.candidates?.[0]?.content?.parts?.[0]?.text ||
+        "रंगों से भरी हो आपकी दुनिया 🌸"
+      );
     }
-    catch(e){ setError(e.message); }
-    finally{ setLoading(false); }
+    catch (e) {
+      setError(e.message);
+    }
+    finally {
+      setLoading(false);
+    }
   };
 
   const upload = e => {
-    const f=e.target.files[0];
-    if(!f) return;
-    const r=new FileReader();
-    r.onload=x=>{
-      setOriginalImage(x.target.result);
-      applyMagic(x.target.result);
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = ev => {
+      setOriginalImage(ev.target.result);
+      applyMagic(ev.target.result);
     };
-    r.readAsDataURL(f);
+    reader.readAsDataURL(file);
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-6 p-6">
+    <div className="min-h-screen flex flex-col items-center justify-center gap-6 p-6 text-center">
       <h1 className="text-4xl font-black">🎨 Holi AI Magic</h1>
 
-      <input ref={fileRef} type="file" onChange={upload} hidden accept="image/*" />
-      <button onClick={()=>fileRef.current.click()} className="px-6 py-3 bg-pink-600 rounded-xl">
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/*"
+        hidden
+        onChange={upload}
+      />
+
+      <button
+        onClick={() => fileRef.current.click()}
+        className="px-8 py-3 bg-pink-600 rounded-xl font-bold hover:bg-pink-700"
+      >
         फोटो चुनें
       </button>
 
-      {loading && <p>AI काम कर रहा है...</p>}
-      {error && <p className="text-red-400">{error}</p>}
+      {loading && <p className="animate-pulse">AI काम कर रहा है…</p>}
+      {error && <p className="text-red-400 font-bold">{error}</p>}
 
       {processedImage && (
-        <>
-          <img src={processedImage} className="w-72 rounded-xl"/>
+        <div className="space-y-4">
+          <img src={processedImage} className="w-72 mx-auto rounded-xl shadow-xl"/>
           <p className="italic text-pink-300">“{shayari}”</p>
-        </>
+
+          <a
+            href={processedImage}
+            download="holi-ai-magic.png"
+            className="inline-block px-6 py-2 bg-white text-black rounded-lg font-bold"
+          >
+            डाउनलोड करें
+          </a>
+        </div>
       )}
     </div>
   );
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+ReactDOM
+  .createRoot(document.getElementById("root"))
+  .render(<App />);
 </script>
 </body>
 </html>
