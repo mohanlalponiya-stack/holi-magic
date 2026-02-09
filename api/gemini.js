@@ -7,12 +7,12 @@ export default async function handler(req, res) {
     const { model, payload } = req.body;
 
     if (!model || !payload) {
-      return res.status(400).json({ error: "Missing model or payload" });
+      return res.status(400).json({ error: "Invalid request body" });
     }
 
     const API_KEY = process.env.GEMINI_API_KEY;
     if (!API_KEY) {
-      return res.status(500).json({ error: "API key not found" });
+      return res.status(500).json({ error: "API key not configured" });
     }
 
     const response = await fetch(
