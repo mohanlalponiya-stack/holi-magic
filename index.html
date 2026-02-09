@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Holi AI Magic Pro | जादुई होली उत्सव 2026</title>
+    <title>Holi AI Magic Pro | जादुई होली उत्सव</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- React & Babel -->
@@ -11,7 +11,7 @@
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&display=swap');
         
         :root {
             --primary: #ff0080;
@@ -21,26 +21,59 @@
 
         body { 
             font-family: 'Outfit', sans-serif; 
-            background: #020202; 
+            background: #050505; 
             color: white; 
             margin: 0; 
             overflow-x: hidden;
         }
 
-        /* एनिमेटेड बैकग्राउंड मेश */
-        .bg-mesh {
+        /* एनिमेटेड बैकग्राउंड ब्लब्स */
+        .blob {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 15% 15%, rgba(255, 0, 128, 0.2) 0%, transparent 40%),
-                        radial-gradient(circle at 85% 85%, rgba(121, 40, 202, 0.2) 0%, transparent 40%),
-                        radial-gradient(circle at 50% 50%, rgba(255, 140, 0, 0.1) 0%, transparent 60%);
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            filter: blur(120px);
+            border-radius: 50%;
             z-index: -1;
+            opacity: 0.2;
+            animation: move 20s infinite alternate;
         }
 
-        .glass-panel {
+        @keyframes move {
+            from { transform: translate(-10%, -10%); }
+            to { transform: translate(20%, 20%); }
+        }
+
+        .glass {
             background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+        }
+
+        /* जादुई फ्रेम एनीमेशन */
+        .magic-frame {
+            position: relative;
+            padding: 8px;
+            background: linear-gradient(45deg, #ff0080, #ff8c00, #7928ca, #ff0080);
+            background-size: 300% 300%;
+            border-radius: 2rem;
+            animation: gradientBorder 5s ease infinite;
+        }
+
+        @keyframes gradientBorder {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .magic-frame-inner {
+            background: #0a0a0a;
+            border-radius: 1.6rem;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
         }
 
         .text-gradient {
@@ -49,81 +82,34 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* प्रीमियम मैजिक फ्रेम डिज़ाइन */
-        .magic-frame {
-            position: relative;
-            padding: 14px;
-            background: linear-gradient(45deg, #ff0080, #ff8c00, #7928ca, #ff0080);
-            background-size: 300% 300%;
-            border-radius: 2.5rem;
-            box-shadow: 0 0 60px rgba(255, 0, 128, 0.4);
-            animation: borderRotate 8s linear infinite;
-        }
-        
-        @keyframes borderRotate {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        .btn-festive {
+            background: linear-gradient(to right, #ff0080, #ff8c00);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .magic-frame::before {
-            content: '';
-            position: absolute;
-            inset: 7px;
-            background: #080808;
-            border-radius: 2.1rem;
-            z-index: 0;
+        .btn-festive:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px -5px rgba(255, 0, 128, 0.5);
         }
 
-        .frame-content {
-            position: relative;
-            z-index: 1;
-            overflow: hidden;
-            border-radius: 2rem;
-        }
-
-        .loader {
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-top: 4px solid #ff0080;
+        .loader-dots div {
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
+            background: var(--primary);
+            animation: bounce 0.6s infinite alternate;
         }
+        .loader-dots div:nth-child(2) { animation-delay: 0.2s; }
+        .loader-dots div:nth-child(3) { animation-delay: 0.4s; }
 
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        .btn-glow:hover {
-            box-shadow: 0 0 35px rgba(255, 0, 128, 0.7);
-            transform: scale(1.03);
-        }
-
-        .ai-message-box {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 0, 128, 0.3);
-            border-radius: 1.5rem;
-            padding: 1.5rem;
-            margin-top: 1rem;
-            box-shadow: inset 0 0 20px rgba(255, 0, 128, 0.1);
-        }
-
-        .fade-up {
-            animation: fadeUp 0.8s ease-out forwards;
-        }
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes bounce { to { transform: translateY(-10px); opacity: 0.3; } }
     </style>
 </head>
 <body>
-    <div class="bg-mesh"></div>
-    <div id="root">
-        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh;">
-            <div class="loader"></div>
-            <p style="color: white; font-family: 'Outfit', sans-serif; margin-top: 20px; font-weight: 600; letter-spacing: 2px;">HOLI AI MAGIC PRO लोड हो रहा है...</p>
-        </div>
-    </div>
+    <div class="blob" style="top: 0; left: 0;"></div>
+    <div class="blob" style="bottom: 0; right: 0; background: var(--accent);"></div>
+    
+    <div id="root"></div>
 
     <script type="text/babel">
         const { useState, useRef, useEffect } = React;
@@ -132,29 +118,24 @@
             const [originalImage, setOriginalImage] = useState(null);
             const [processedImage, setProcessedImage] = useState(null);
             const [isProcessing, setIsProcessing] = useState(false);
-            const [isGeneratingText, setIsGeneratingText] = useState(false);
-            const [generatedWishes, setGeneratedWishes] = useState("");
-            const [error, setError] = useState(null);
-            const [scrolled, setScrolled] = useState(false);
+            const [aiShayari, setAiShayari] = useState("");
             const [isSpeaking, setIsSpeaking] = useState(false);
-            
+            const [error, setError] = useState(null);
+            const [isGeneratingShayari, setIsGeneratingShayari] = useState(false);
+
             const fileInputRef = useRef(null);
-            const editorRef = useRef(null);
+            const apiKey = ""; // API key रनटाइम पर सिस्टम द्वारा दी जाएगी
 
-            // अनिवार्य: Canvas वातावरण में इसे खाली रखना आवश्यक है
-            const apiKey = ""; 
-
+            // Exponential backoff retry logic
             const fetchWithRetry = async (url, options, maxRetries = 5) => {
                 let delay = 1000;
                 for (let i = 0; i < maxRetries; i++) {
                     try {
                         const response = await fetch(url, options);
                         if (response.ok) return response;
-                        
-                        // 429 (Rate limit) या 500+ पर पुनः प्रयास करें
                         if (response.status !== 429 && response.status < 500) {
-                            const errData = await response.json().catch(() => ({}));
-                            throw new Error(errData.error?.message || `सर्वर त्रुटि (${response.status})`);
+                            const errData = await response.json();
+                            throw new Error(errData.error?.message || "सर्वर एरर");
                         }
                     } catch (e) {
                         if (i === maxRetries - 1) throw e;
@@ -162,21 +143,15 @@
                     await new Promise(resolve => setTimeout(resolve, delay));
                     delay *= 2;
                 }
-                throw new Error("नेटवर्क कनेक्शन धीमा है या एआई बिजी है। कृपया पुनः प्रयास करें।");
+                throw new Error("अभी सर्वर व्यस्त है, कृपया पुनः प्रयास करें।");
             };
 
-            useEffect(() => {
-                const handleScroll = () => setScrolled(window.scrollY > 50);
-                window.addEventListener('scroll', handleScroll);
-                return () => window.removeEventListener('scroll', handleScroll);
-            }, []);
-
-            const applyHoliTransformation = async (imageUri) => {
+            const applyMagic = async (imageUri) => {
                 setIsProcessing(true);
                 setError(null);
                 const base64Data = imageUri.split(',')[1];
-                
-                const prompt = "Perform a vibrant Holi festival makeover. Apply high-quality, organic gulal colors (neon pink, bright yellow, and blue) to the subject's face and clothes. Completely change the background to a festive Holi scene with clouds of color and celebration. Ensure the lighting is bright and joyful.";
+
+                const prompt = "Perform a professional Holi makeover. Add vibrant, thick organic gulal powder colors (pink, orange, yellow) on the face and clothes. Replace the background with a cinematic festive Holi morning celebration scene with colorful dust clouds and bright sunlight. Output must be a high-quality festive photo.";
 
                 try {
                     const response = await fetchWithRetry(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`, {
@@ -189,9 +164,7 @@
                                     { inlineData: { mimeType: "image/png", data: base64Data } }
                                 ]
                             }],
-                            generationConfig: { 
-                                responseModalities: ['TEXT', 'IMAGE']
-                            }
+                            generationConfig: { responseModalities: ['TEXT', 'IMAGE'] }
                         })
                     });
 
@@ -200,9 +173,9 @@
                     
                     if (base64) {
                         setProcessedImage(`data:image/png;base64,${base64}`);
-                        setTimeout(() => editorRef.current?.scrollIntoView({ behavior: 'smooth' }), 500);
+                        generateShayari();
                     } else {
-                        throw new Error("एआई वर्तमान में इमेज प्रोसेस नहीं कर पा रहा है। कृपया फिर से प्रयास करें।");
+                        throw new Error("एआई इमेज नहीं बना सका।");
                     }
                 } catch (err) {
                     setError(err.message);
@@ -211,42 +184,34 @@
                 }
             };
 
-            const generateHoliShayari = async () => {
-                setIsGeneratingText(true);
-                setGeneratedWishes("");
-
-                const prompt = "Generate a cheerful 4-line Holi Shayari in Hindi. Keep it festive and poetic.";
-
+            const generateShayari = async () => {
+                setIsGeneratingShayari(true);
                 try {
                     const response = await fetchWithRetry(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            contents: [{ parts: [{ text: prompt }] }],
-                            systemInstruction: { parts: [{ text: "You are a creative Hindi poet." }] }
+                            contents: [{ parts: [{ text: "होली के इस सुंदर अवसर पर एक छोटी और मधुर 2 लाइन की शायरी लिखें।" }] }]
                         })
                     });
-
-                    const result = await response.json();
-                    const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
-                    setGeneratedWishes(text || "होली के रंगों की बौछार, मुबारक हो आपको खुशियों का त्योहार!");
-                } catch (err) {
-                    setGeneratedWishes("होली की ढेर सारी शुभकामनाएँ! रंगों भरा हो आपका जीवन।");
+                    const data = await response.json();
+                    setAiShayari(data.candidates?.[0]?.content?.parts?.[0]?.text || "मुबारक हो आपको होली का त्यौहार!");
+                } catch (e) {
+                    setAiShayari("मुबारक हो आपको होली का त्यौहार!");
                 } finally {
-                    setIsGeneratingText(false);
+                    setIsGeneratingShayari(false);
                 }
             };
 
-            const playVoiceWish = async () => {
-                if (!generatedWishes || isSpeaking) return;
+            const playVoice = async () => {
+                if (!aiShayari || isSpeaking) return;
                 setIsSpeaking(true);
-
                 try {
                     const response = await fetchWithRetry(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            contents: [{ parts: [{ text: `Say cheerfully in Hindi: ${generatedWishes}` }] }],
+                            contents: [{ parts: [{ text: `उत्साह के साथ कहें: ${aiShayari}` }] }],
                             generationConfig: { 
                                 responseModalities: ["AUDIO"], 
                                 speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Aoede" } } } 
@@ -254,19 +219,13 @@
                             model: "gemini-2.5-flash-preview-tts"
                         })
                     });
-
                     const result = await response.json();
                     const pcmData = result.candidates[0].content.parts[0].inlineData.data;
-                    
-                    const wavBlob = pcmToWav(pcmData, 24000); 
-                    const url = URL.createObjectURL(wavBlob);
-                    const audio = new Audio(url);
+                    const wavBlob = pcmToWav(pcmData, 24000);
+                    const audio = new Audio(URL.createObjectURL(wavBlob));
                     audio.play();
-                    audio.onended = () => {
-                        setIsSpeaking(false);
-                        URL.revokeObjectURL(url);
-                    };
-                } catch (err) {
+                    audio.onended = () => setIsSpeaking(false);
+                } catch (e) {
                     setIsSpeaking(false);
                 }
             };
@@ -292,180 +251,161 @@
                 return new Blob([header, pcmBuffer], { type: 'audio/wav' });
             };
 
-            const onFileSelect = (e) => {
+            const handleUpload = (e) => {
                 const file = e.target.files[0];
                 if (file) {
                     const reader = new FileReader();
                     reader.onload = (ev) => {
                         setOriginalImage(ev.target.result);
                         setProcessedImage(null);
-                        setGeneratedWishes("");
-                        applyHoliTransformation(ev.target.result);
+                        setAiShayari("");
+                        applyMagic(ev.target.result);
                     };
                     reader.readAsDataURL(file);
                 }
             };
 
             return (
-                <div className="min-h-screen pb-20">
-                    <nav className={`fixed top-0 w-full z-50 transition-all duration-500 px-6 py-4 ${scrolled ? 'bg-black/90 backdrop-blur-xl border-b border-white/10 shadow-lg' : 'bg-transparent'}`}>
-                        <div className="max-w-7xl mx-auto flex justify-between items-center">
-                            <div className="flex items-center gap-3">
-                                <div className="w-12 h-12 bg-gradient-to-tr from-[#ff0080] to-[#7928ca] rounded-2xl flex items-center justify-center font-black text-2xl italic shadow-xl text-white">H</div>
-                                <span className="text-2xl font-black tracking-tighter italic uppercase">होली<span className="text-[#ff0080]">PRO</span></span>
-                            </div>
-                            <button 
-                                onClick={() => fileInputRef.current.click()}
-                                className="bg-gradient-to-r from-[#ff0080] to-[#ff8c00] text-white px-8 py-3 rounded-full font-bold text-sm btn-glow transition-all active:scale-95 shadow-lg uppercase tracking-wider"
-                            >
-                                होली मनाएं 🎉
-                            </button>
+                <div className="min-h-screen flex flex-col items-center">
+                    {/* Header */}
+                    <nav className="w-full max-w-6xl px-6 py-8 flex justify-between items-center relative z-10">
+                        <div className="flex items-center gap-2">
+                            <div className="w-10 h-10 bg-gradient-to-br from-pink-600 to-orange-500 rounded-xl flex items-center justify-center font-black text-xl italic shadow-lg shadow-pink-500/30">H</div>
+                            <h1 className="text-2xl font-black italic tracking-tighter uppercase">होली<span className="text-[#ff0080] text-3xl">PRO</span></h1>
                         </div>
+                        <button 
+                            onClick={() => fileInputRef.current.click()}
+                            className="bg-white text-black px-6 py-2 rounded-full font-bold text-sm btn-festive transition-all shadow-lg active:scale-95 text-white"
+                        >
+                            फोटो अपलोड 🎉
+                        </button>
                     </nav>
 
-                    <header className="relative pt-48 pb-32 px-6 flex flex-col items-center text-center">
-                        <div className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-white/5 border border-white/10 mb-12 animate-pulse">
-                            <span className="w-2.5 h-2.5 rounded-full bg-[#ff0080]"></span>
-                            <span className="text-xs font-bold tracking-[0.4em] uppercase text-gray-300">Advanced AI Editor 2026</span>
-                        </div>
+                    {/* Main Content */}
+                    <main className="w-full max-w-5xl px-6 py-10 flex flex-col items-center gap-12 relative z-10">
                         
-                        <h1 className="text-7xl md:text-[12rem] font-black mb-10 leading-[0.8] tracking-tighter italic uppercase drop-shadow-2xl">
-                            RANGON KA <br />
-                            <span className="text-gradient">MAGIC</span>
-                        </h1>
-                        
-                        <p className="text-gray-400 max-w-2xl text-lg md:text-xl font-medium mb-16 leading-relaxed">
-                            बस एक फोटो और एआई का जादू! अपनी यादों को रंगों से सराबोर करें।
-                        </p>
+                        {!originalImage ? (
+                            <div className="text-center space-y-10 py-10">
+                                <div className="space-y-4">
+                                    <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold tracking-[0.2em] uppercase text-pink-400 animate-pulse">
+                                        Next-Gen AI Photo Editing
+                                    </div>
+                                    <h2 className="text-6xl md:text-9xl font-black italic tracking-tighter leading-none">
+                                        रंगों का <br />
+                                        <span className="text-gradient">जादू यहाँ है!</span>
+                                    </h2>
+                                    <p className="text-gray-400 max-w-xl mx-auto text-lg md:text-xl font-medium">अपनी साधारण फोटो को एआई की मदद से एक शानदार होली उत्सव में बदलें।</p>
+                                </div>
 
-                        <div className="flex flex-col items-center gap-14">
-                            <div 
-                                onClick={() => fileInputRef.current.click()}
-                                className="magic-frame w-80 h-80 md:w-[450px] md:h-[450px] cursor-pointer group hover:scale-105 transition-transform"
-                            >
-                                <div className="frame-content w-full h-full flex flex-col items-center justify-center bg-[#050505] rounded-[2rem] border border-white/5">
-                                    <div className="text-8xl mb-8 group-hover:scale-110 transition-transform">📸</div>
-                                    <h3 className="text-2xl font-black text-white mb-3 tracking-wide uppercase italic">फोटो चुनें</h3>
-                                    <p className="text-gray-500 text-[11px] uppercase tracking-[0.3em] px-10 text-center opacity-60">AI अपने आप रंग लगा देगा</p>
+                                <div 
+                                    onClick={() => fileInputRef.current.click()}
+                                    className="magic-frame w-72 h-72 md:w-[450px] md:h-[450px] mx-auto cursor-pointer group"
+                                >
+                                    <div className="magic-frame-inner w-full h-full flex flex-col items-center justify-center gap-6">
+                                        <div className="text-8xl group-hover:scale-110 transition-transform drop-shadow-2xl">📸</div>
+                                        <div className="space-y-2">
+                                            <h3 className="text-xl font-bold uppercase tracking-widest italic text-white">फोटो चुनें</h3>
+                                            <p className="text-gray-500 text-[10px] uppercase tracking-[0.3em]">AI अपने आप रंग लगा देगा</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+                        ) : (
+                            <div className="w-full grid lg:grid-cols-2 gap-10 items-start">
+                                {/* Original Photo Container */}
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-2">
+                                        <span className="w-2 h-2 rounded-full bg-gray-600"></span>
+                                        <h3 className="text-xs font-bold uppercase tracking-[0.3em] opacity-50">Original Photo</h3>
+                                    </div>
+                                    <div className="rounded-[3rem] overflow-hidden glass opacity-30 border border-white/5 shadow-inner">
+                                        <img src={originalImage} className="w-full aspect-[4/5] object-cover" />
+                                    </div>
+                                </div>
 
-                            <button 
-                                onClick={() => fileInputRef.current.click()}
-                                className="bg-white text-black px-16 py-6 rounded-[3rem] font-black text-3xl flex items-center gap-5 hover:bg-[#ff0080] hover:text-white transition-all shadow-2xl btn-glow uppercase tracking-tighter"
-                            >
-                                जादू शुरू करें ✨
-                            </button>
-                            <input type="file" ref={fileInputRef} onChange={onFileSelect} className="hidden" accept="image/*" />
-                        </div>
-                    </header>
-
-                    <section ref={editorRef} className="py-24 px-6 relative z-10 scroll-mt-24 max-w-7xl mx-auto">
-                        {originalImage && (
-                            <div className="glass-panel rounded-[5rem] p-10 md:p-20 border border-white/5 shadow-3xl fade-up">
-                                <div className="grid lg:grid-cols-2 gap-20 items-start">
-                                    <div className="space-y-8 w-full">
-                                        <div className="flex items-center gap-4">
-                                            <span className="w-12 h-1 bg-gray-700"></span>
-                                            <h2 className="text-3xl font-black italic tracking-tight uppercase opacity-40">Original</h2>
-                                        </div>
-                                        <div className="rounded-[4rem] overflow-hidden border border-white/5 opacity-30 grayscale shadow-inner">
-                                            <img src={originalImage} className="w-full aspect-[4/5] object-cover" alt="Original" />
+                                {/* Result Container */}
+                                <div className="space-y-8">
+                                    <div className="flex items-center gap-2">
+                                        <span className="w-2 h-2 rounded-full bg-pink-500 animate-pulse"></span>
+                                        <h3 className="text-xs font-bold uppercase tracking-[0.3em] text-[#ff0080]">Magic Result</h3>
+                                    </div>
+                                    
+                                    <div className="magic-frame w-full aspect-[4/5]">
+                                        <div className="magic-frame-inner w-full h-full bg-black/60">
+                                            {isProcessing ? (
+                                                <div className="w-full h-full flex flex-col items-center justify-center p-10 text-center gap-8">
+                                                    <div className="loader-dots flex gap-2"><div></div><div></div><div></div></div>
+                                                    <div className="space-y-2">
+                                                        <h3 className="text-3xl font-black italic tracking-tighter uppercase animate-pulse">रंग घोले जा रहे हैं...</h3>
+                                                        <p className="text-[10px] text-gray-500 italic uppercase tracking-[0.4em]">बुरा न मानो होली है! 🎨</p>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <img src={processedImage || originalImage} className="w-full h-full object-cover" />
+                                            )}
                                         </div>
                                     </div>
 
-                                    <div className="space-y-10 w-full">
-                                        <div className="flex items-center gap-4">
-                                            <span className="w-12 h-1 bg-pink-600"></span>
-                                            <h2 className="text-3xl font-black italic tracking-tight uppercase text-[#ff0080]">Magic Result</h2>
-                                        </div>
-                                        <div className="magic-frame aspect-[4/5] w-full">
-                                            <div className="frame-content w-full h-full bg-black/60 rounded-[2.2rem] overflow-hidden">
-                                                {isProcessing ? (
-                                                    <div className="w-full h-full flex flex-col items-center justify-center p-14 text-center">
-                                                        <div className="loader mb-10 scale-150"></div>
-                                                        <h3 className="text-3xl font-black italic mb-3 tracking-widest animate-pulse uppercase">रंग घोले जा रहे हैं...</h3>
-                                                        <p className="text-sm text-gray-500 italic uppercase">बुरा न मानो होली है! 🎨</p>
-                                                    </div>
+                                    {!isProcessing && processedImage && (
+                                        <div className="space-y-8 animate-in slide-in-from-bottom duration-700">
+                                            {/* AI Feature Box */}
+                                            <div className="glass p-8 rounded-[3rem] space-y-4 relative overflow-hidden group">
+                                                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">✨</div>
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-[10px] font-bold uppercase tracking-widest text-pink-500">AI Message</span>
+                                                    <button onClick={playVoice} disabled={isSpeaking} className="p-3 bg-white/5 rounded-full hover:bg-pink-500/20 transition-colors">
+                                                        {isSpeaking ? '🔊' : '🔊 आवाज सुनें'}
+                                                    </button>
+                                                </div>
+                                                {isGeneratingShayari ? (
+                                                    <div className="h-10 w-full bg-white/5 animate-pulse rounded-lg"></div>
                                                 ) : (
-                                                    <img 
-                                                        src={processedImage || originalImage} 
-                                                        className="w-full h-full object-cover" 
-                                                        alt="Holi Magic"
-                                                    />
+                                                    <p className="text-2xl font-bold italic text-pink-100 leading-snug">"{aiShayari}"</p>
                                                 )}
                                             </div>
-                                        </div>
 
-                                        {processedImage && !isProcessing && (
-                                            <div className="space-y-10 fade-up">
-                                                <div className="flex gap-6">
-                                                    <button 
-                                                        onClick={() => { setOriginalImage(null); setProcessedImage(null); setGeneratedWishes(""); }}
-                                                        className="flex-1 py-5 rounded-3xl bg-white/5 font-bold hover:bg-white/10 transition border border-white/10 text-xs uppercase tracking-[0.2em]"
-                                                    >
-                                                        बदलें
-                                                    </button>
-                                                    <button 
-                                                        onClick={() => {
-                                                            const a = document.createElement('a');
-                                                            a.href = processedImage;
-                                                            a.download = 'holi_magic_pro_2026.png';
-                                                            a.click();
-                                                        }}
-                                                        className="flex-[2] py-5 rounded-3xl bg-white text-black font-black text-2xl hover:scale-[1.03] transition shadow-2xl btn-glow uppercase tracking-tighter"
-                                                    >
-                                                        सेव करें ⬇️
-                                                    </button>
-                                                </div>
-
-                                                <div className="pt-10 border-t border-white/10 space-y-6">
-                                                    <h3 className="text-xl font-black italic text-pink-500 uppercase tracking-tighter">✨ AI स्पेशल फीचर्स</h3>
-                                                    <div className="flex flex-wrap gap-4">
-                                                        <button 
-                                                            disabled={isGeneratingText}
-                                                            onClick={generateHoliShayari}
-                                                            className="flex-1 px-8 py-5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-[2rem] font-black text-sm btn-glow transition-all uppercase tracking-widest flex items-center justify-center gap-3"
-                                                        >
-                                                            {isGeneratingText ? "लिख रहा हूँ..." : "✨ AI होली संदेश"}
-                                                        </button>
-                                                        
-                                                        {generatedWishes && (
-                                                            <button 
-                                                                disabled={isSpeaking}
-                                                                onClick={playVoiceWish}
-                                                                className="px-8 py-5 bg-white/5 border border-white/10 rounded-[2rem] font-bold text-sm hover:bg-white/10 transition-all flex items-center gap-3"
-                                                            >
-                                                                {isSpeaking ? "🔊 बोल रहा हूँ..." : "🔊 आवाज सुनें"}
-                                                            </button>
-                                                        )}
-                                                    </div>
-
-                                                    {generatedWishes && (
-                                                        <div className="ai-message-box text-left fade-up">
-                                                            <p className="text-2xl font-semibold italic text-pink-100 leading-snug font-serif">
-                                                                "{generatedWishes}"
-                                                            </p>
-                                                        </div>
-                                                    )}
-                                                </div>
+                                            {/* Action Buttons */}
+                                            <div className="flex gap-4">
+                                                <button 
+                                                    onClick={() => { setOriginalImage(null); setProcessedImage(null); setAiShayari(""); }}
+                                                    className="flex-1 py-5 rounded-3xl bg-white/5 font-bold hover:bg-white/10 transition border border-white/10 text-xs uppercase tracking-[0.2em]"
+                                                >
+                                                    फोटो बदलें
+                                                </button>
+                                                <button 
+                                                    onClick={() => {
+                                                        const a = document.createElement('a');
+                                                        a.href = processedImage;
+                                                        a.download = 'holi_magic_pro_2026.png';
+                                                        a.click();
+                                                    }}
+                                                    className="flex-[2] py-5 rounded-3xl bg-white text-black font-black text-xl hover:scale-105 transition shadow-2xl shadow-white/5 uppercase tracking-tighter"
+                                                >
+                                                    सेव करें ⬇️
+                                                </button>
                                             </div>
-                                        )}
-                                    </div>
+                                        </div>
+                                    )}
                                 </div>
-                                {error && (
-                                    <div className="mt-12 bg-red-600/10 border border-red-500/30 p-10 rounded-[3rem] text-red-400 font-bold text-center">
-                                        <div className="text-3xl mb-4">⚠️</div>
-                                        <p className="mb-6">{error}</p>
-                                        <button onClick={() => originalImage && applyHoliTransformation(originalImage)} className="text-xs underline uppercase tracking-[0.3em] font-black">पुनः प्रयास करें</button>
-                                    </div>
-                                )}
                             </div>
                         )}
-                    </section>
 
-                    <footer className="py-32 text-center opacity-40">
-                        <p className="text-[11px] font-bold tracking-[0.7em] uppercase">Produced with Love by HOLI PRO AI Lab • Powered by Gemini AI</p>
+                        {error && (
+                            <div className="glass bg-red-600/10 border border-red-500/30 p-8 rounded-[2.5rem] text-red-400 font-bold text-center flex flex-col items-center gap-4">
+                                <div className="text-3xl">⚠️</div>
+                                <p>{error}</p>
+                                <button onClick={() => originalImage && applyMagic(originalImage)} className="text-[10px] underline uppercase tracking-widest">पुनः प्रयास करें</button>
+                            </div>
+                        )}
+                    </main>
+
+                    <input type="file" ref={fileInputRef} onChange={handleUpload} className="hidden" accept="image/*" />
+                    
+                    <footer className="mt-auto py-20 text-center opacity-30 space-y-4">
+                        <div className="flex justify-center gap-4">
+                            {[1,2,3,4,5].map(i => <div key={i} className="w-1 h-1 rounded-full bg-pink-600"></div>)}
+                        </div>
+                        <p className="text-[10px] font-bold tracking-[0.8em] uppercase">Produced with Love by HOLI PRO AI Lab • 2026</p>
                     </footer>
                 </div>
             );
